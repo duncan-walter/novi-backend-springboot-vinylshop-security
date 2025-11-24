@@ -18,7 +18,7 @@ De repository is de klasse die communiceert met de database, maar dan moet er we
 
 # Randvoorwaarden
 
-- Zorg dat je mappenstructuur aan de MAven voorwaarden voldoet
+- Zorg dat je mappenstructuur aan de Maven voorwaarden voldoet
 - Je mappen structuur heeft ten minste de packages: 
   - controllers
   - entities
@@ -37,7 +37,7 @@ De repository is de klasse die communiceert met de database, maar dan moet er we
   - GenreEntity
   - PublisherEntity
   - BaseEntity
-- Je hebt de juiste instellingen in je application.properties om de dataabse connectie goed tot stand te brengen.
+- Je hebt de juiste instellingen in je application.properties om de database connectie goed tot stand te brengen.
 - Je hebt de juiste dependencies aan het project gekoppeld.
 - Je hebt minimaal één record van beide entiteiten in je data.sql staan.
 - Je hebt een export van Postman met up-to-date requests voor beide entiteiten
