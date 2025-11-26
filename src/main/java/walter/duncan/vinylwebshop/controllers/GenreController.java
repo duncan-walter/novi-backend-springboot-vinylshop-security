@@ -22,14 +22,7 @@ public class GenreController {
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK) // Ik weet dat GetMapping dit automatisch doet, maar hoe explicieter hoe beter!
     public ResponseEntity<GenreEntity> getGenreById(@PathVariable Long id) {
-        var genreEntity = genreService.findGenreById(id);
-
-        // IntelliJ geeft aan dat dit in één expressie kan, maar voor de duidelijkheid laat ik het zo staan
-        if (genreEntity.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.ok(genreEntity.get());
+        return ResponseEntity.ok(this.genreService.findGenreById(id));
     }
 
     @GetMapping
