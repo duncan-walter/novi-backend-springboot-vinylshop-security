@@ -1,6 +1,5 @@
 package walter.duncan.vinylwebshop.controllers;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,19 +21,16 @@ public class GenreController {
     }
 
     @GetMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK) // Ik weet dat GetMapping dit automatisch doet, maar hoe explicieter hoe beter!
     public ResponseEntity<GenreEntity> getGenreById(@PathVariable Long id) {
         return ResponseEntity.ok(this.genreService.findGenreById(id));
     }
 
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<GenreEntity>> getGenres() {
         return ResponseEntity.ok(this.genreService.findAllGenres());
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<GenreEntity> createGenre(@RequestBody GenreEntity genre) {
         var genreEntity = this.genreService.createGenre(genre);
         var location = this.urlHelper.getResourceUri(genreEntity.getId());
@@ -43,7 +39,6 @@ public class GenreController {
     }
 
     @PutMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<GenreEntity> updateGenre(@PathVariable Long id, @RequestBody GenreEntity genre) {
         var updatedGenre = this.genreService.updateGenre(id, genre);
         var location = this.urlHelper.getResourceUri(updatedGenre.getId());
@@ -52,7 +47,6 @@ public class GenreController {
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Object> deleteGenre(@PathVariable Long id) {
         this.genreService.deleteGenre(id);
 
