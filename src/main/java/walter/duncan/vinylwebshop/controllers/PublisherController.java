@@ -1,9 +1,11 @@
 package walter.duncan.vinylwebshop.controllers;
 
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import walter.duncan.vinylwebshop.entities.PublisherEntity;
+import walter.duncan.vinylwebshop.dtos.publisher.PublisherRequestDto;
+import walter.duncan.vinylwebshop.dtos.publisher.PublisherResponseDto;
 import walter.duncan.vinylwebshop.helpers.UrlHelper;
 import walter.duncan.vinylwebshop.services.PublisherService;
 
@@ -21,29 +23,29 @@ public class PublisherController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PublisherEntity> getPublisherById(@PathVariable Long id) {
+    public ResponseEntity<PublisherResponseDto> getPublisherById(@PathVariable Long id) {
         return ResponseEntity.ok(this.publisherService.findPublisherById(id));
     }
 
     @GetMapping
-    public ResponseEntity<List<PublisherEntity>> getPublishers() {
+    public ResponseEntity<List<PublisherResponseDto>> getPublishers() {
         return ResponseEntity.ok(this.publisherService.findAllPublishers());
     }
 
     @PostMapping
-    public ResponseEntity<PublisherEntity> createPublisher(@RequestBody PublisherEntity publisher) {
-        var publisherEntity = this.publisherService.createPublisher(publisher);
-        var location = this.urlHelper.getResourceUri(publisherEntity.getId());
+    public ResponseEntity<PublisherResponseDto> createPublisher(@Valid @RequestBody PublisherRequestDto publisherRequestDto) {
+        var publisherResponseDto = this.publisherService.createPublisher(publisherRequestDto);
+        var location = this.urlHelper.getResourceUri(publisherResponseDto.id());
 
-        return ResponseEntity.created(location).body(publisherEntity);
+        return ResponseEntity.created(location).body(publisherResponseDto);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PublisherEntity> updatePublisher(@PathVariable Long id, @RequestBody PublisherEntity publisher) {
-        var updatePublisher = this.publisherService.updatePublisher(id, publisher);
-        var location = this.urlHelper.getResourceUri(updatePublisher.getId());
+    public ResponseEntity<PublisherResponseDto> updatePublisher(@PathVariable Long id, @Valid @RequestBody PublisherRequestDto publisherRequestDto) {
+        var publisherResponseDto = this.publisherService.updatePublisher(id, publisherRequestDto);
+        var location = this.urlHelper.getResourceUri(publisherResponseDto.id());
 
-        return ResponseEntity.ok().location(location).body(updatePublisher);
+        return ResponseEntity.ok().location(location).body(publisherResponseDto);
     }
 
     @DeleteMapping("/{id}")

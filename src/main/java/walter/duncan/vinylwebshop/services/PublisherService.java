@@ -2,38 +2,44 @@ package walter.duncan.vinylwebshop.services;
 
 import org.springframework.stereotype.Service;
 
+import walter.duncan.vinylwebshop.dtos.publisher.PublisherRequestDto;
+import walter.duncan.vinylwebshop.dtos.publisher.PublisherResponseDto;
 import walter.duncan.vinylwebshop.entities.PublisherEntity;
+import walter.duncan.vinylwebshop.mappers.PublisherDtoMapper;
 import walter.duncan.vinylwebshop.repositories.PublisherRepository;
 
 import java.util.List;
 
 @Service
 public class PublisherService extends BaseService<PublisherEntity, Long> {
-    public PublisherService(PublisherRepository publisherRepository) {
+    private final PublisherDtoMapper publisherDtoMapper;
+
+    public PublisherService(PublisherRepository publisherRepository, PublisherDtoMapper publisherDtoMapper) {
         super(publisherRepository);
+        this.publisherDtoMapper = publisherDtoMapper;
     }
 
-    public List<PublisherEntity> findAllPublishers() {
-        return this.repository.findAll();
+    public List<PublisherResponseDto> findAllPublishers() {
+        return this.publisherDtoMapper.toDto(this.repository.findAll());
     }
 
-    public PublisherEntity findPublisherById(Long id) {
-        return this.getExistingById(id);
+    public PublisherResponseDto findPublisherById(Long id) {
+        return this.publisherDtoMapper.toDto(this.getExistingById(id));
     }
 
-    public PublisherEntity createPublisher(PublisherEntity publisherEntity) {
-        publisherEntity.clearId();
+    public PublisherResponseDto createPublisher(PublisherRequestDto publisherRequestDto) {
+        var publisherEntity = this.publisherDtoMapper.toEntity(publisherRequestDto);
 
-        return this.repository.save(publisherEntity);
+        return this.publisherDtoMapper.toDto(this.repository.save(publisherEntity));
     }
 
-    public PublisherEntity updatePublisher(Long id, PublisherEntity publisherEntity) {
+    public PublisherResponseDto updatePublisher(Long id, PublisherRequestDto publisherRequestDto) {
         var persistedEntity = this.getExistingById(id);
-        persistedEntity.setName(publisherEntity.getName());
-        persistedEntity.setAddress(publisherEntity.getAddress());
-        persistedEntity.setContactDetails(publisherEntity.getContactDetails());
+        persistedEntity.setName(publisherRequestDto.getName());
+        persistedEntity.setAddress(publisherRequestDto.getAddress());
+        persistedEntity.setContactDetails(publisherRequestDto.getContactDetails());
 
-        return this.repository.save(persistedEntity);
+        return this.publisherDtoMapper.toDto(this.repository.save(persistedEntity));
     }
 
     public void deletePublisher(Long id) {

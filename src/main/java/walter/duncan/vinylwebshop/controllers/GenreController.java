@@ -1,9 +1,11 @@
 package walter.duncan.vinylwebshop.controllers;
 
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import walter.duncan.vinylwebshop.entities.GenreEntity;
+import walter.duncan.vinylwebshop.dtos.genre.GenreRequestDto;
+import walter.duncan.vinylwebshop.dtos.genre.GenreResponseDto;
 import walter.duncan.vinylwebshop.helpers.UrlHelper;
 import walter.duncan.vinylwebshop.services.GenreService;
 
@@ -21,29 +23,29 @@ public class GenreController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<GenreEntity> getGenreById(@PathVariable Long id) {
+    public ResponseEntity<GenreResponseDto> getGenreById(@PathVariable Long id) {
         return ResponseEntity.ok(this.genreService.findGenreById(id));
     }
 
     @GetMapping
-    public ResponseEntity<List<GenreEntity>> getGenres() {
+    public ResponseEntity<List<GenreResponseDto>> getGenres() {
         return ResponseEntity.ok(this.genreService.findAllGenres());
     }
 
     @PostMapping
-    public ResponseEntity<GenreEntity> createGenre(@RequestBody GenreEntity genre) {
-        var genreEntity = this.genreService.createGenre(genre);
-        var location = this.urlHelper.getResourceUri(genreEntity.getId());
+    public ResponseEntity<GenreResponseDto> createGenre(@Valid @RequestBody GenreRequestDto genreRequestDto) {
+        var genreResponseDto = this.genreService.createGenre(genreRequestDto);
+        var location = this.urlHelper.getResourceUri(genreResponseDto.id());
 
-        return ResponseEntity.created(location).body(genreEntity);
+        return ResponseEntity.created(location).body(genreResponseDto);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<GenreEntity> updateGenre(@PathVariable Long id, @RequestBody GenreEntity genre) {
-        var updatedGenre = this.genreService.updateGenre(id, genre);
-        var location = this.urlHelper.getResourceUri(updatedGenre.getId());
+    public ResponseEntity<GenreResponseDto> updateGenre(@PathVariable Long id, @Valid @RequestBody GenreRequestDto genreRequestDto) {
+        var genreResponseDto = this.genreService.updateGenre(id, genreRequestDto);
+        var location = this.urlHelper.getResourceUri(genreResponseDto.id());
 
-        return ResponseEntity.ok().location(location).body(updatedGenre);
+        return ResponseEntity.ok().location(location).body(genreResponseDto);
     }
 
     @DeleteMapping("/{id}")
