@@ -316,12 +316,59 @@ We gaan dit "makkelijk" oplossen door aan de bestaande "get all albums" methode 
 Als die parameter niet `null` is, dan roepen we de `albumService.getAlbumsWithStock` aan.
 Als dit parameter wel `null` is, dan roepen we gewoon `albumService.findAlbumById` aan.
 
-De `albumService.getAlbumsWithStock` returned een "List<AlbumResponseDTO>" en ontvangt een "Boolean stock" als input. Zorg dat de functie alle albums MET stock returned als de stock-boolean TRUE is en alle albums ZONDER stock returned als de stock-boolen FALSE is.
+De `albumService.getAlbumsWithStock` returned een "List<AlbumResponseDTO>" en ontvangt een "Boolean stock" als input. Zorg dat de functie alle albums MET stock returned als de stock-boolean TRUE is en alle albums ZONDER stock returned als de stock-boolean FALSE is.
 
 
 ## Stap 7 (Delete)
 
 [//]: # (TODO: delete probleem uitleggen en laten oplossen)
+Misschien heb je inmiddels al je API getest in PostMan en heb je al gemerkt dat je in je console een error krijgt zoals deze: 
+
+```terminaloutput
+org.postgresql.util.PSQLException: ERROR: update or delete on table "albums" violates foreign key constraint...
+```
+
+Deze error krijg je omdat er in een andere tabel nog een Foreign Key staat die naar het object verwijst dat jij probeert te verwijderen. Dat gaat niet. Je moet er dus voor zorgen dat die relatie eerst verbroken wordt, voordat je het object kunt verwijderen. We gaan per entiteit bekijken hoe je dat probleem kunt oplossen: 
+
+### Publisher
+De publisher heeft een relatie met Album waarbij Album de eigenaar van de relatie is.
+
+Deze is makkelijk te verbreken, omdat Publisher en Album een bidirectionele relatie hebben (in PublisherEntity staat een List<AlbumEntity>). Je kunt:
+- in `PublisherService.deletePublisher` eenvoudig de te-verwijderen-publisher uit de `PublisherRepository` halen 
+- vervolgens door de `publisher.getAlbums()` loopen 
+- van alle albums de publisher op `null` zetten met de setter
+- en dan dat album saven met `albumRepository.save`
+
+Als je dat gedaan hebt, kun je veilig de publisher deleten.
+
+### Genre
+De Genre heeft een relatie met Album waarbij Album de eigenaar van de relatie is.
+
+In `GenreService.deleteGenre` is het iets lastiger, omdat Genre een unidirectionele relatie met Album heeft. Je kunt dus niet de Albums uit Genre halen met een getter. Je kunt wel:
+- door `albumRepository.findByGenre_Id` heen loopen 
+- alle Genre's op `null` zetten met de setter
+- en dat vervolgens saven met `albumRepository.save`
+
+Vergeet daarna niet om de Genre nog te deleten uit de GenreRepository.
+
+### Album
+De Album heeft een relatie met Stock waarbij Stock de eigenaar van de relatie is.
+We gaan niet zomaar stocks verwijderen, als die er zijn. Dan zouden we inkomsten mislopen.
+Nee, we gaan er voor zorgen dat we geen Album kunnen verwijderen als deze nog Stock heeft.
+
+Om dit probleem op te lossen, moet je in `AlbumService.deleteAlbum` eerst de te-verwijderen-album uit de repository halen.
+
+Daarna ga je controleren of dit album stocks heeft of niet (is de stocks lijst leeg of niet). 
+
+Als die lijst leeg is, mag je het album verwijderen. Er is dan ook geen conflict met relaties. 
+
+Als de lijst niet leeg is, dan zou er een conflict zijn, maar we mogen het Album dan ook niet verwijderen. We hoeven dat conflict daarom niet op te lossen.
+
+### Stock en Artist
+Deze modellen hebben geen conflict met de delete functionaliteit.
+
+
+
 
 
 
