@@ -186,8 +186,7 @@ Deze repository krijgt drie extra functionaliteit:
 ```
 
 
-[//]: # (Todo: stap 5 maken)
-## Stap 4 (Data)
+## Stap 5 (Data)
 Vul de data.sql met data voor je nieuwe entiteiten. 
 Voeg daar ook relaties aan toe. 
 
@@ -215,7 +214,7 @@ Start je applicatie op en kijk in je database of alle Foreign Keys en koppeltabe
 
 > Wil je het dynamisch maken, probeer dan geen "hardcoded" foreign keys in je data.sql te zetten, maar zet daarvoor in de plaats een select statement tussen haakjes.
 
-## Stap 5 (DTO's) 
+## Stap 6 (DTO's) 
 
 Nu je de relaties in je entiteiten hebt, is je database in orde, maar je API nog niet. Wanneer je jouw API aanspreekt via PostMan, krijg je nog niet de data over relaties te zien. Niet alle entiteiten hoeven alle relaties te laten zien, dat zou al snel erg ingewikkeld worden.
 
@@ -259,7 +258,7 @@ In dat geval ziet de mapToDto er zo uit:
     }
 ```
 
-## Stap 6 (Functionaliteit)
+## Stap 7 (Functionaliteit)
 
 Je hebt nu de Entiteiten en DTO's voor Album, Artist, Stock, Genre en Publisher. Je hebt ook Controllers, Services en Repositories voor al deze modellen, met basis "CRUD" functionaliteiten. 
 
@@ -348,7 +347,7 @@ Als dit parameter wel `null` is, dan roepen we gewoon `albumService.findAlbumByI
 De `albumService.getAlbumsWithStock` returned een "List<AlbumResponseDTO>" en ontvangt een "Boolean stock" als input. Zorg dat de functie alle albums MET stock returned als de stock-boolean TRUE is en alle albums ZONDER stock returned als de stock-boolean FALSE is.
 
 
-## Stap 7 (Delete)
+## Stap 8 (Delete)
 
 [//]: # (TODO: delete probleem uitleggen en laten oplossen)
 Misschien heb je inmiddels al je API getest in PostMan en heb je al gemerkt dat je in je console een error krijgt zoals deze: 
