@@ -13,16 +13,30 @@ import java.util.List;
 public class ArtistDtoMapper implements DtoMapper<ArtistResponseDto, ArtistRequestDto, ArtistEntity> {
     @Override
     public ArtistResponseDto toDto(ArtistEntity model) {
-        return null;
+        return new ArtistResponseDto(
+                model.getId(),
+                model.getName(),
+                model.getBiography()
+        );
     }
 
     @Override
     public List<ArtistResponseDto> toDto(List<ArtistEntity> models) {
-        return new ArrayList<>();
+        var result = new ArrayList<ArtistResponseDto>();
+
+        for (ArtistEntity model : models) {
+            result.add(this.toDto(model));
+        }
+
+        return result;
     }
 
     @Override
     public ArtistEntity toEntity(ArtistRequestDto artistDto) {
-        return null;
+        var entity = new ArtistEntity();
+        entity.setName(artistDto.getName());
+        entity.setBiography(artistDto.getBiography());
+
+        return entity;
     }
 }

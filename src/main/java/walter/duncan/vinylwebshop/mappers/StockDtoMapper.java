@@ -13,16 +13,30 @@ import java.util.List;
 public class StockDtoMapper implements DtoMapper<StockResponseDto, StockRequestDto, StockEntity> {
     @Override
     public StockResponseDto toDto(StockEntity model) {
-        return null;
+        return new StockResponseDto(
+                model.getId(),
+                model.getCondition(),
+                model.getPrice()
+        );
     }
 
     @Override
     public List<StockResponseDto> toDto(List<StockEntity> models) {
-        return new ArrayList<>();
+        var result = new ArrayList<StockResponseDto>();
+
+        for (StockEntity model : models) {
+            result.add(this.toDto(model));
+        }
+
+        return result;
     }
 
     @Override
     public StockEntity toEntity(StockRequestDto stockDto) {
-        return null;
+        var entity = new StockEntity();
+        entity.setCondition(stockDto.getCondition());
+        entity.setPrice(stockDto.getPrice());
+
+        return entity;
     }
 }

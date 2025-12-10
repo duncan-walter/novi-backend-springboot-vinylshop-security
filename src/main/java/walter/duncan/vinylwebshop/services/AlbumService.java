@@ -37,8 +37,8 @@ public class AlbumService extends BaseService<AlbumEntity, Long> {
     @Transactional
     public AlbumResponseDto updateAlbum(Long id, AlbumRequestDto albumRequestDto) {
         var persistedEntity = this.getExistingById(id);
-        persistedEntity.setTitle("placeholder");
-        persistedEntity.setReleaseYear(9999);
+        persistedEntity.setTitle(albumRequestDto.getTitle());
+        persistedEntity.setReleaseYear(albumRequestDto.getReleaseYear());
 
         return this.albumDtoMapper.toDto(this.repository.save(persistedEntity));
     }

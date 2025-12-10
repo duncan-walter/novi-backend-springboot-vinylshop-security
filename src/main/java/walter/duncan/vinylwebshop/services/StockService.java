@@ -37,8 +37,8 @@ public class StockService extends BaseService<StockEntity, Long> {
     @Transactional
     public StockResponseDto updateStock(Long id, StockRequestDto stockRequestDto) {
         var persistedEntity = getExistingById(id);
-        persistedEntity.setCondition("placeholder");
-        persistedEntity.setPrice(9999);
+        persistedEntity.setCondition(stockRequestDto.getCondition());
+        persistedEntity.setPrice(stockRequestDto.getPrice());
 
         return this.stockDtoMapper.toDto(this.repository.save(persistedEntity));
     }

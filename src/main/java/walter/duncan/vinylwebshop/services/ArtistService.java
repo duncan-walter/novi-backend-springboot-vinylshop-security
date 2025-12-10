@@ -37,8 +37,8 @@ public class ArtistService extends BaseService<ArtistEntity, Long> {
     @Transactional
     public ArtistResponseDto updateArtist(Long id, ArtistRequestDto artistRequestDto) {
         var persistedEntity = this.getExistingById(id);
-        persistedEntity.setName("placeholder");
-        persistedEntity.setBiography("placeholder");
+        persistedEntity.setName(artistRequestDto.getName());
+        persistedEntity.setBiography(artistRequestDto.getBiography());
 
         return this.artistDtoMapper.toDto(this.repository.save(persistedEntity));
     }
