@@ -1,5 +1,10 @@
 package walter.duncan.vinylwebshop.entities;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "artists")
 public class ArtistEntity extends BaseEntity {
     private String name;
     private String biography;

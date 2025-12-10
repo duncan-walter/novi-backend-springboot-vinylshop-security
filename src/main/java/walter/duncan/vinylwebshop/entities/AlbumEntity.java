@@ -1,5 +1,10 @@
 package walter.duncan.vinylwebshop.entities;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "albums")
 public class AlbumEntity extends BaseEntity {
     private String title;
     private int releaseYear;
