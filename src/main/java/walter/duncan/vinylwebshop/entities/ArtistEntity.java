@@ -8,12 +8,12 @@ import java.util.Set;
 @Entity
 @Table(name = "artists")
 public class ArtistEntity extends BaseEntity {
-    @Column(name = "name", nullable = false)
     @Length(min = 2, max = 100)
+    @Column(name = "name", nullable = false, length = 100)
     private String name;
 
-    @Column(name = "biography")
     @Length(max = 5000)
+    @Column(name = "biography", length = 5000)
     private String biography;
 
     @ManyToMany
@@ -23,7 +23,6 @@ public class ArtistEntity extends BaseEntity {
             inverseJoinColumns = @JoinColumn(name = "album_id")
     )
     private Set<AlbumEntity> albums;
-
 
     public String getName() {
         return this.name;

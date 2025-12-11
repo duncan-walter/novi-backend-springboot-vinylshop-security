@@ -9,8 +9,8 @@ public class StockEntity extends BaseEntity {
     @Column(name = "condition", nullable = false)
     private String condition;
 
-    @Column(name = "price")
     @Max((long)Double.MAX_VALUE)
+    @Column(name = "price")
     private double price;
 
     @ManyToOne
