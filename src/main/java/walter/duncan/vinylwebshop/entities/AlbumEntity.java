@@ -27,6 +27,12 @@ public class AlbumEntity extends BaseEntity {
     @ManyToMany(mappedBy = "albums")
     private Set<ArtistEntity> artists;
 
+    // It was tempting to choose @OneToOne here, but then a genre can only be referenced by one album.
+    // In reality albums can share the same genre of course, hence why I picked @ManyToOne.
+    @ManyToOne
+    @JoinColumn(name = "genre_id")
+    private GenreEntity genre;
+
     public String getTitle() {
         return this.title;
     }
