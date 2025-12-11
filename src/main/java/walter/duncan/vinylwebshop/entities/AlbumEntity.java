@@ -1,13 +1,21 @@
 package walter.duncan.vinylwebshop.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
 
 @Entity
 @Table(name = "albums")
 public class AlbumEntity extends BaseEntity {
+    @Column(name = "title", nullable = false)
     private String title;
+
+    @Column(name = "release_year")
+    @Max(9999)
     private int releaseYear;
+
+    @ManyToOne()
+    @JoinColumn(name = "publisher_id")
+    private PublisherEntity publisher;
 
     public String getTitle() {
         return this.title;

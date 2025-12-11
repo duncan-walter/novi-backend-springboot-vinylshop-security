@@ -1,8 +1,8 @@
 package walter.duncan.vinylwebshop.entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
+import java.util.Set;
 
 @Entity
 @Table(name = "publishers")
@@ -15,6 +15,9 @@ public class PublisherEntity extends BaseEntity {
 
     @Column(name = "contact_details")
     private String contactDetails;
+
+    @OneToMany(mappedBy = "publisher")
+    private Set<AlbumEntity> albums;
 
     public String getName() {
         return this.name;
