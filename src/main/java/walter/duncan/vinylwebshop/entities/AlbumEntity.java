@@ -22,10 +22,11 @@ public class AlbumEntity extends BaseEntity {
     private int releaseYear;
 
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.SET_NULL)
     @JoinColumn(name = "publisher_id")
     private PublisherEntity publisher;
 
-    @OneToMany(mappedBy = "album", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "album")
     private Set<StockEntity> stockItems;
 
     @ManyToMany

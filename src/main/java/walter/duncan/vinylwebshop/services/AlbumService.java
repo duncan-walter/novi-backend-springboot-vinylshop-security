@@ -9,6 +9,8 @@ import walter.duncan.vinylwebshop.dtos.album.AlbumResponseDto;
 import walter.duncan.vinylwebshop.entities.AlbumEntity;
 import walter.duncan.vinylwebshop.entities.GenreEntity;
 import walter.duncan.vinylwebshop.entities.PublisherEntity;
+import walter.duncan.vinylwebshop.exceptions.BusinessRuleViolation;
+import walter.duncan.vinylwebshop.exceptions.BusinessRuleViolationException;
 import walter.duncan.vinylwebshop.mappers.AlbumDtoMapper;
 import walter.duncan.vinylwebshop.mappers.AlbumExtendedDtoMapper;
 import walter.duncan.vinylwebshop.repositories.AlbumRepository;
@@ -105,7 +107,15 @@ public class AlbumService extends BaseService<AlbumEntity, Long, AlbumRepository
 
     @Transactional
     public void deleteAlbum(Long id) {
-        this.ensureExistsById(id);
+        var persistedEntity = this.getExistingById(id);
+
+        if (!persistedEntity.getStockItems().isEmpty()) {
+            throw new BusinessRuleViolationException(
+                    BusinessRuleViolation.CANT_DELETE_ALBUM_WHEN_IT_HAS_STOCK,
+                    String.format("Unable to delete album with id %s since it has stock linked to it", id)
+            );
+        }
+
         this.repository.deleteById(id);
     }
 

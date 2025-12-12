@@ -63,6 +63,27 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(problemDetail.getStatus()).body(problemDetail);
     }
 
+    // TODO: Investigate if a notification collector approach is more sustainable and efficient.
+    @ExceptionHandler(value = BusinessRuleViolationException.class)
+    public ResponseEntity<ProblemDetail> businessRuleViolationExceptionHandler(BusinessRuleViolationException exception) {
+        var problemDetail = this.createProblemDetailBase(HttpStatus.UNPROCESSABLE_ENTITY);
+        problemDetail.setType(URI.create("urn:vinyl-webshop:api:problem:business-rule-violation"));
+        problemDetail.setTitle("Unprocessable Entity");
+        problemDetail.setDetail("A business rule was violated.");
+
+        String businessRuleError = exception.getMessage();
+
+        /* TODO: Ensure this has the same structure as validation errors.
+            At the moment this can't be achieved yet since a BusinessRuleViolationException is thrown when it is found.
+            Perhaps this can be fixed with the a notification collector?
+         */
+        Map<String, String> errors = new HashMap<>();
+        errors.put("businessRuleViolation", businessRuleError);
+        problemDetail.setProperty("errors", errors);
+
+        return ResponseEntity.status(problemDetail.getStatus()).body(problemDetail);
+    }
+
     @ExceptionHandler(value = RuntimeException.class)
     public ResponseEntity<ProblemDetail> uncaughtExceptionHandler(RuntimeException exception) {
         // TODO: Log exception stacktrace and other details somewhere so that the application can be improved upon.
