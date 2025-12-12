@@ -3,12 +3,14 @@ package walter.duncan.vinylwebshop.services;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import walter.duncan.vinylwebshop.dtos.album.AlbumExtendedResponseDto;
 import walter.duncan.vinylwebshop.dtos.album.AlbumRequestDto;
 import walter.duncan.vinylwebshop.dtos.album.AlbumResponseDto;
 import walter.duncan.vinylwebshop.entities.AlbumEntity;
 import walter.duncan.vinylwebshop.entities.GenreEntity;
 import walter.duncan.vinylwebshop.entities.PublisherEntity;
 import walter.duncan.vinylwebshop.mappers.AlbumDtoMapper;
+import walter.duncan.vinylwebshop.mappers.AlbumExtendedDtoMapper;
 import walter.duncan.vinylwebshop.repositories.AlbumRepository;
 
 import java.util.List;
@@ -16,27 +18,30 @@ import java.util.List;
 @Service
 public class AlbumService extends BaseService<AlbumEntity, Long, AlbumRepository> {
     private final AlbumDtoMapper albumDtoMapper;
+    private final AlbumExtendedDtoMapper albumExtendedDtoMapper;
     private final GenreService genreService;
     private final PublisherService publisherService;
 
     protected AlbumService(
             AlbumRepository albumRepository,
             AlbumDtoMapper albumDtoMapper,
+            AlbumExtendedDtoMapper albumExtendedDtoMapper,
             GenreService genreService,
             PublisherService publisherService
     ) {
         super(albumRepository, AlbumEntity.class);
         this.albumDtoMapper = albumDtoMapper;
+        this.albumExtendedDtoMapper = albumExtendedDtoMapper;
         this.genreService = genreService;
         this.publisherService = publisherService;
     }
 
-    public List<AlbumResponseDto> findAllAlbums() {
-        return this.albumDtoMapper.toDto(this.repository.findAll());
+    public List<AlbumExtendedResponseDto> findAllAlbums() {
+        return this.albumExtendedDtoMapper.toDto(this.repository.findAll());
     }
 
-    public AlbumResponseDto findAlbumById(Long id) {
-        return this.albumDtoMapper.toDto(this.getExistingById(id));
+    public AlbumExtendedResponseDto findAlbumById(Long id) {
+        return this.albumExtendedDtoMapper.toDto(this.getExistingById(id));
     }
 
     @Transactional

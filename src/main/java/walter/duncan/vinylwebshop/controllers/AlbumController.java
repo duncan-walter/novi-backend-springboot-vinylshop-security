@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import walter.duncan.vinylwebshop.dtos.album.AlbumExtendedResponseDto;
 import walter.duncan.vinylwebshop.dtos.album.AlbumRequestDto;
 import walter.duncan.vinylwebshop.dtos.album.AlbumResponseDto;
 import walter.duncan.vinylwebshop.helpers.UrlHelper;
@@ -23,12 +24,12 @@ public class AlbumController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<AlbumResponseDto> getAlbumById(@PathVariable Long id) {
+    public ResponseEntity<AlbumExtendedResponseDto> getAlbumById(@PathVariable Long id) {
         return ResponseEntity.ok(this.albumService.findAlbumById(id));
     }
 
     @GetMapping
-    public ResponseEntity<List<AlbumResponseDto>> getAlbums() {
+    public ResponseEntity<List<AlbumExtendedResponseDto>> getAlbums() {
         return ResponseEntity.ok(this.albumService.findAllAlbums());
     }
 
