@@ -21,19 +21,22 @@ public class AlbumService extends BaseService<AlbumEntity, Long, AlbumRepository
     private final AlbumExtendedDtoMapper albumExtendedDtoMapper;
     private final GenreService genreService;
     private final PublisherService publisherService;
+    private final ArtistService artistService;
 
     protected AlbumService(
             AlbumRepository albumRepository,
             AlbumDtoMapper albumDtoMapper,
             AlbumExtendedDtoMapper albumExtendedDtoMapper,
             GenreService genreService,
-            PublisherService publisherService
+            PublisherService publisherService,
+            ArtistService artistService
     ) {
         super(albumRepository, AlbumEntity.class);
         this.albumDtoMapper = albumDtoMapper;
         this.albumExtendedDtoMapper = albumExtendedDtoMapper;
         this.genreService = genreService;
         this.publisherService = publisherService;
+        this.artistService = artistService;
     }
 
     public List<AlbumExtendedResponseDto> findAllAlbums() {
@@ -104,5 +107,25 @@ public class AlbumService extends BaseService<AlbumEntity, Long, AlbumRepository
     public void deleteAlbum(Long id) {
         this.ensureExistsById(id);
         this.repository.deleteById(id);
+    }
+
+    @Transactional
+    public void linkArtist(Long id, Long artistId) {
+        // TODO: Check if artist it already present in album's artists.
+        var persistedEntity = this.getExistingById(id);
+        var persistedArtistEntity = this.artistService.getExistingById(artistId);
+        persistedEntity.addArtist(persistedArtistEntity);
+
+        this.repository.save(persistedEntity);
+    }
+
+    @Transactional
+    public void unlinkArtist(Long id, Long artistId) {
+        // TODO: Check if artist it already present in album's artists.
+        var persistedEntity = this.getExistingById(id);
+        var persistedArtistEntity = this.artistService.getExistingById(artistId);
+        persistedEntity.removeArtist(persistedArtistEntity);
+
+        this.repository.save(persistedEntity);
     }
 }

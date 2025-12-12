@@ -60,4 +60,18 @@ public class AlbumController {
 
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/{id}/artists/{artistId}")
+    public ResponseEntity<Void> linkArtist(@PathVariable Long id, @PathVariable Long artistId) {
+        this.albumService.linkArtist(id, artistId);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{id}/artists/{artistId}")
+    public ResponseEntity<Void> unlinkArtist(@PathVariable Long id, @PathVariable Long artistId) {
+        this.albumService.unlinkArtist(id, artistId);
+
+        return ResponseEntity.ok().build();
+    }
 }
