@@ -35,14 +35,14 @@ VALUES ('The Nightmare Before Christmas', 1993, (SELECT id FROM genres WHERE nam
        ('Funky Town Revival', 1975, (SELECT id FROM genres WHERE name = '70''s'), (SELECT id FROM publishers WHERE name = 'RetroGroove Media'), NOW(), NOW());
 
 -- Arist-album data
-INSERT INTO artist_album (artist_id, album_id)
-VALUES ((SELECT id FROM artists WHERE name = 'Mr. Skeleton'), (SELECT id FROM albums WHERE title = 'The Nightmare Before Christmas')),
-       ((SELECT id FROM artists WHERE name = 'DJ Disco Inferno'), (SELECT id FROM albums WHERE title = 'Disco Fever')),
-       ((SELECT id FROM artists WHERE name = 'Rocky Thunder'), (SELECT id FROM albums WHERE title = 'Disco Fever')),
-       ((SELECT id FROM artists WHERE name = 'Rocky Thunder'), (SELECT id FROM albums WHERE title = 'Thunderstrike')),
-       ((SELECT id FROM artists WHERE name = 'Maestro Allegro'), (SELECT id FROM albums WHERE title = 'Symphony No.7 in D')),
-       ((SELECT id FROM artists WHERE name = 'Funky Joe'), (SELECT id FROM albums WHERE title = 'Funky Town Revival')),
-       ((SELECT id FROM artists WHERE name = 'DJ Disco Inferno'), (SELECT id FROM albums WHERE title = 'Funky Town Revival'));
+INSERT INTO albums_artists (album_id, artist_id)
+VALUES ((SELECT id FROM albums WHERE title = 'The Nightmare Before Christmas'), (SELECT id FROM artists WHERE name = 'Mr. Skeleton')),
+       ((SELECT id FROM albums WHERE title = 'Disco Fever'), (SELECT id FROM artists WHERE name = 'DJ Disco Inferno')),
+       ((SELECT id FROM albums WHERE title = 'Disco Fever'), (SELECT id FROM artists WHERE name = 'Rocky Thunder')),
+       ((SELECT id FROM albums WHERE title = 'Thunderstrike'), (SELECT id FROM artists WHERE name = 'Rocky Thunder')),
+       ((SELECT id FROM albums WHERE title = 'Symphony No.7 in D'), (SELECT id FROM artists WHERE name = 'Maestro Allegro')),
+       ((SELECT id FROM albums WHERE title = 'Funky Town Revival'), (SELECT id FROM artists WHERE name = 'Funky Joe')),
+       ((SELECT id FROM albums WHERE title = 'Funky Town Revival'), (SELECT id FROM artists WHERE name = 'DJ Disco Inferno'));
 
 -- Stock data
 INSERT INTO stocks (condition, price, album_id, created_date, modified_date)

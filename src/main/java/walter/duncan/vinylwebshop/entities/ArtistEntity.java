@@ -16,12 +16,7 @@ public class ArtistEntity extends BaseEntity {
     @Column(name = "biography", length = 5000)
     private String biography;
 
-    @ManyToMany
-    @JoinTable(
-            name = "artist_album",
-            joinColumns = @JoinColumn(name = "artist_id"),
-            inverseJoinColumns = @JoinColumn(name = "album_id")
-    )
+    @ManyToMany(mappedBy = "artists")
     private Set<AlbumEntity> albums;
 
     public String getName() {

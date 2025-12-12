@@ -3,6 +3,8 @@ package walter.duncan.vinylwebshop.entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.validator.constraints.Length;
 
 import java.util.Set;
@@ -26,12 +28,18 @@ public class AlbumEntity extends BaseEntity {
     @OneToMany(mappedBy = "album", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<StockEntity> stockItems;
 
-    @ManyToMany(mappedBy = "albums")
+    @ManyToMany
+    @JoinTable(
+            name = "albums_artists",
+            joinColumns = @JoinColumn(name = "album_id"),
+            inverseJoinColumns = @JoinColumn(name = "artist_id")
+    )
     private Set<ArtistEntity> artists;
 
     // It was tempting to choose @OneToOne here, but then a genre can only be referenced by one album.
     // In reality albums can share the same genre of course, hence why I picked @ManyToOne.
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.SET_NULL)
     @JoinColumn(name = "genre_id")
     private GenreEntity genre;
 
@@ -81,5 +89,13 @@ public class AlbumEntity extends BaseEntity {
 
     public void setGenre(GenreEntity genre) {
         this.genre = genre;
+    }
+
+    public void addArtist(ArtistEntity artistEntity) {
+        this.artists.add(artistEntity);
+    }
+
+    public void removeArtist(ArtistEntity artistEntity) {
+        this.artists.remove(artistEntity);
     }
 }
