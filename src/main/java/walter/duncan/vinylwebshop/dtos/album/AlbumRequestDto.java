@@ -10,7 +10,7 @@ public class AlbumRequestDto {
     @Size(min = 3, max = 100, message = "Title must be between 2 and 100 characters.")
     private String title;
 
-    @Min(value = 1877, message = "Release year must be at least 1877")
+    @Min(value = 1877, message = "Release year must be at least 1877.")
     @Max(value = 2100, message = "Release year must not exceed 9999.")
     private int releaseYear;
 
