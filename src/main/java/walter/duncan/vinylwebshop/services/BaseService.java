@@ -2,9 +2,10 @@ package walter.duncan.vinylwebshop.services;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import walter.duncan.vinylwebshop.entities.BaseEntity;
 import walter.duncan.vinylwebshop.exceptions.ResourceNotFoundException;
 
-public abstract class BaseService<TEntity, TId> {
+public abstract class BaseService<TEntity extends BaseEntity, TId> {
     protected final JpaRepository<TEntity, TId> repository;
     private final Class<TEntity> entityClass;
 
@@ -27,6 +28,10 @@ public abstract class BaseService<TEntity, TId> {
         }
 
         return entity.get();
+    }
+
+    protected boolean isSameById(TEntity entity, TId id) {
+        return entity != null && entity.getId().equals(id);
     }
 
     private void throwResourceNotFoundException(TId id) {

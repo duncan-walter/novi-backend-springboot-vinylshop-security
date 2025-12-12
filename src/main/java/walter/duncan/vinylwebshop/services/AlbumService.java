@@ -6,6 +6,8 @@ import org.springframework.transaction.annotation.Transactional;
 import walter.duncan.vinylwebshop.dtos.album.AlbumRequestDto;
 import walter.duncan.vinylwebshop.dtos.album.AlbumResponseDto;
 import walter.duncan.vinylwebshop.entities.AlbumEntity;
+import walter.duncan.vinylwebshop.entities.GenreEntity;
+import walter.duncan.vinylwebshop.entities.PublisherEntity;
 import walter.duncan.vinylwebshop.mappers.AlbumDtoMapper;
 import walter.duncan.vinylwebshop.repositories.AlbumRepository;
 
@@ -14,10 +16,19 @@ import java.util.List;
 @Service
 public class AlbumService extends BaseService<AlbumEntity, Long> {
     private final AlbumDtoMapper albumDtoMapper;
+    private final GenreService genreService;
+    private final PublisherService publisherService;
 
-    protected AlbumService(AlbumRepository albumRepository, AlbumDtoMapper albumDtoMapper) {
+    protected AlbumService(
+            AlbumRepository albumRepository,
+            AlbumDtoMapper albumDtoMapper,
+            GenreService genreService,
+            PublisherService publisherService
+    ) {
         super(albumRepository, AlbumEntity.class);
         this.albumDtoMapper = albumDtoMapper;
+        this.genreService = genreService;
+        this.publisherService = publisherService;
     }
 
     public List<AlbumResponseDto> findAllAlbums() {
@@ -28,8 +39,28 @@ public class AlbumService extends BaseService<AlbumEntity, Long> {
         return this.albumDtoMapper.toDto(this.getExistingById(id));
     }
 
+    @Transactional
     public AlbumResponseDto createAlbum(AlbumRequestDto albumRequestDto) {
         var albumEntity = this.albumDtoMapper.toEntity(albumRequestDto);
+
+        if (albumRequestDto.getGenreId() != null) {
+            /* TODO: INTRODUCE DOMAIN MODELS - ARCHITECTURAL / MAPPING.
+                The usual way to find a resource in the current approach is by using the findXById() method, which returns a response dto.
+                A genre response dto cannot be used to set the genre of an album through the setGenre() method of an album entity as it expects a genre entity.
+                Right now the protected getExistingById() method if being used to get an genre entity instead.
+                This is only possible because AlbumService and GenreService are in the same package.
+                In the future, as the application expands, this may not be possible anymore.
+                Domain models can solve this by acting as man in the middle and services will return them instead of response dtos.
+                These domain models may be mapped back to entities and response dtos and vice versa.
+            */
+            var genreEntity = this.genreService.getExistingById(albumRequestDto.getGenreId());
+            albumEntity.setGenre(genreEntity);
+        }
+
+        if (albumRequestDto.getPublisherId() != null) {
+            var publisherEntity = this.publisherService.getExistingById(albumRequestDto.getPublisherId());
+            albumEntity.setPublisher(publisherEntity);
+        }
 
         return this.albumDtoMapper.toDto(this.repository.save(albumEntity));
     }
@@ -37,8 +68,29 @@ public class AlbumService extends BaseService<AlbumEntity, Long> {
     @Transactional
     public AlbumResponseDto updateAlbum(Long id, AlbumRequestDto albumRequestDto) {
         var persistedEntity = this.getExistingById(id);
+
+        var genreId = albumRequestDto.getGenreId();
+        GenreEntity genreEntity = null;
+        if (genreId != null) {
+            var persistedGenreEntity = persistedEntity.getGenre();
+            genreEntity = this.genreService.isSameById(persistedGenreEntity, genreId)
+                    ? persistedGenreEntity
+                    : this.genreService.getExistingById(genreId);
+        }
+
+        var publisherId = albumRequestDto.getPublisherId();
+        PublisherEntity publisherEntity = null;
+        if (publisherId != null) {
+            var persistedPublisherEntity = persistedEntity.getPublisher();
+            publisherEntity = this.publisherService.isSameById(persistedPublisherEntity, publisherId)
+                    ? persistedPublisherEntity
+                    : this.publisherService.getExistingById(publisherId);
+        }
+
         persistedEntity.setTitle(albumRequestDto.getTitle());
         persistedEntity.setReleaseYear(albumRequestDto.getReleaseYear());
+        persistedEntity.setGenre(genreEntity);
+        persistedEntity.setPublisher(publisherEntity);
 
         return this.albumDtoMapper.toDto(this.repository.save(persistedEntity));
     }
