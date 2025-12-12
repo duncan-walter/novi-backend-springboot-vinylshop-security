@@ -16,16 +16,19 @@ import java.util.List;
 public class AlbumExtendedDtoMapper implements DtoMapper<AlbumExtendedResponseDto, AlbumRequestDto, AlbumEntity> {
     private final AlbumDtoMapper albumDtoMapper;
     private final StockDtoMapper stockDtoMapper;
+    private final ArtistDtoMapper artistDtoMapper;
 
-    public AlbumExtendedDtoMapper(AlbumDtoMapper albumDtoMapper, StockDtoMapper stockDtoMapper) {
+    public AlbumExtendedDtoMapper(AlbumDtoMapper albumDtoMapper, StockDtoMapper stockDtoMapper, ArtistDtoMapper artistDtoMapper) {
         this.albumDtoMapper = albumDtoMapper;
         this.stockDtoMapper = stockDtoMapper;
+        this.artistDtoMapper = artistDtoMapper;
     }
 
     @Override
     public AlbumExtendedResponseDto toDto(AlbumEntity model) {
         var albumResponseDto = this.albumDtoMapper.toDto(model);
         var stockItems = model.getStockItems();
+        var artists = model.getArtists();
 
         return new AlbumExtendedResponseDto(
                 albumResponseDto.getId(),
@@ -35,6 +38,9 @@ public class AlbumExtendedDtoMapper implements DtoMapper<AlbumExtendedResponseDt
                 albumResponseDto.getPublisher(),
                 stockItems != null
                         ? this.stockDtoMapper.toDto(new ArrayList<>(stockItems))
+                        : new ArrayList<>(),
+                artists != null
+                        ? this.artistDtoMapper.toDto(new ArrayList<>(artists))
                         : new ArrayList<>()
         );
     }
