@@ -34,4 +34,12 @@ public class StockEntity extends BaseEntity {
     public void setPrice(double price) {
         this.price = price;
     }
+
+    public AlbumEntity getAlbum() {
+        return album;
+    }
+
+    public void setAlbum(AlbumEntity album) {
+        this.album = album;
+    }
 }

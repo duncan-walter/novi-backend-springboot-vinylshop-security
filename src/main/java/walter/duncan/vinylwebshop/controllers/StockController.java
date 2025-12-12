@@ -12,7 +12,7 @@ import walter.duncan.vinylwebshop.services.StockService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/stocks")
+@RequestMapping("/albums/{albumId}/stocks")
 public class StockController {
     private final UrlHelper urlHelper;
     private final StockService stockService;
@@ -23,19 +23,19 @@ public class StockController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<StockResponseDto> getStockById(@PathVariable Long id) {
-        return ResponseEntity.ok(this.stockService.findStockById(id));
+    public ResponseEntity<StockResponseDto> getStockByIdAndAlbumId(@PathVariable Long id, @PathVariable Long albumId) {
+        return ResponseEntity.ok(this.stockService.findStockByIdAndAlbumId(id, albumId));
     }
 
     @GetMapping
-    public ResponseEntity<List<StockResponseDto>> getStocks() {
-        return ResponseEntity.ok(this.stockService.findAllStocks());
+    public ResponseEntity<List<StockResponseDto>> getStocksByAlbumId(@PathVariable Long albumId) {
+        return ResponseEntity.ok(this.stockService.findAllStocksByAlbumId(albumId));
     }
 
     @PostMapping
-    public ResponseEntity<StockResponseDto> createStock(@RequestBody @Valid StockRequestDto stockRequestDto) {
-        var stockResponseDto = this.stockService.createStock(stockRequestDto);
-        var location = this.urlHelper.getResourceUri(0L);
+    public ResponseEntity<StockResponseDto> createStockByAlbumId(@PathVariable Long albumId, @RequestBody @Valid StockRequestDto stockRequestDto) {
+        var stockResponseDto = this.stockService.createStock(stockRequestDto, albumId);
+        var location = this.urlHelper.getResourceUri(stockResponseDto.id());
 
         return ResponseEntity
                 .created(location)
@@ -43,9 +43,9 @@ public class StockController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<StockResponseDto> updateStock(@PathVariable Long id, @RequestBody @Valid StockRequestDto stockRequestDto) {
-        var stockResponseDto = this.stockService.updateStock(id, stockRequestDto);
-        var location = this.urlHelper.getResourceUri(0L);
+    public ResponseEntity<StockResponseDto> updateStockByAlbumId(@PathVariable Long id, @PathVariable Long albumId, @RequestBody @Valid StockRequestDto stockRequestDto) {
+        var stockResponseDto = this.stockService.updateStock(stockRequestDto, id, albumId);
+        var location = this.urlHelper.getResourceUri(stockResponseDto.id());
 
         return ResponseEntity
                 .ok()

@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import walter.duncan.vinylwebshop.dtos.stock.StockRequestDto;
 import walter.duncan.vinylwebshop.dtos.stock.StockResponseDto;
 import walter.duncan.vinylwebshop.entities.StockEntity;
+import walter.duncan.vinylwebshop.mappers.AlbumExtendedDtoMapper;
 import walter.duncan.vinylwebshop.mappers.StockDtoMapper;
 import walter.duncan.vinylwebshop.repositories.StockRepository;
 
@@ -14,29 +15,46 @@ import java.util.List;
 @Component
 public class StockService extends BaseService<StockEntity, Long, StockRepository> {
     private final StockDtoMapper stockDtoMapper;
+    private final AlbumService albumService;
 
-    protected StockService(StockRepository stockRepository, StockDtoMapper stockDtoMapper) {
+    protected StockService(StockRepository stockRepository, StockDtoMapper stockDtoMapper, AlbumService albumService) {
         super(stockRepository, StockEntity.class);
         this.stockDtoMapper = stockDtoMapper;
+        this.albumService = albumService;
     }
 
-    public List<StockResponseDto> findAllStocks() {
-        return this.stockDtoMapper.toDto(this.repository.findAll());
+    public List<StockResponseDto> findAllStocksByAlbumId(Long albumId) {
+        return this.stockDtoMapper.toDto(this.repository.findByAlbumId(albumId));
     }
 
-    public StockResponseDto findStockById(Long id) {
-        return this.stockDtoMapper.toDto(this.getExistingById(id));
+    @SuppressWarnings("OptionalGetWithoutIsPresent") // Safe because isEmpty() is checked before using get()
+    public StockResponseDto findStockByIdAndAlbumId(Long id, Long albumId) {
+        var stocks = this.repository.findByIdAndAlbumId(id, albumId);
+
+        if (stocks.isEmpty()) {
+            this.throwResourceNotFoundException(id);
+        }
+
+        return this.stockDtoMapper.toDto(stocks.get());
     }
 
-    public StockResponseDto createStock(StockRequestDto stockRequestDto) {
+    public StockResponseDto createStock(StockRequestDto stockRequestDto, Long albumId) {
         var stockEntity = this.stockDtoMapper.toEntity(stockRequestDto);
+        var persistedAlbumEntity = this.albumService.getExistingById(albumId);
+        stockEntity.setAlbum(persistedAlbumEntity);
 
         return this.stockDtoMapper.toDto(this.repository.save(stockEntity));
     }
 
     @Transactional
-    public StockResponseDto updateStock(Long id, StockRequestDto stockRequestDto) {
+    public StockResponseDto updateStock(StockRequestDto stockRequestDto, Long id, Long albumId) {
         var persistedEntity = getExistingById(id);
+        var persistedAlbumEntity = this.albumService.getExistingById(albumId);
+
+        if (!persistedEntity.getAlbum().getId().equals(persistedAlbumEntity.getId())) {
+            throwResourceNotFoundException(id);
+        }
+
         persistedEntity.setCondition(stockRequestDto.getCondition());
         persistedEntity.setPrice(stockRequestDto.getPrice());
 

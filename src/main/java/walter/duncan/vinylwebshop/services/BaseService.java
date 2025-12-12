@@ -34,7 +34,7 @@ public abstract class BaseService<TEntity extends BaseEntity, TId, TRepository e
         return entity != null && entity.getId().equals(id);
     }
 
-    private void throwResourceNotFoundException(TId id) {
+    protected void throwResourceNotFoundException(TId id) {
         String entityName = entityClass.getSimpleName().replaceAll("Entity", "");
         throw new ResourceNotFoundException(entityName + " with id " + id + " not found.");
     }
