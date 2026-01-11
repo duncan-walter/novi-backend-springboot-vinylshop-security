@@ -1,0 +1,35 @@
+sequenceDiagram
+    box Create stock
+        actor User
+        participant StockController
+        participant StockService
+        participant AlbumService
+        participant AlbumRepository
+        participant StockRepository
+    end
+
+    User->>+StockController: /api/albums/{albumId}/stocks { stockRequestDto }
+    StockController->>StockController: Authentication check
+    alt Unauthorized
+        StockController-->>User: ResponseEntity(HttpStatus.UNAUTHORIZED)
+    else Authorized
+        StockController->>+StockService: createStock(stockRequestDto, albumId)
+        StockService->>StockService: Map StockRequestDto to StockEntity
+        StockService->>+AlbumService: getExistingById(albumId)
+
+        AlbumService->>+AlbumRepository: findById(albumId)
+        alt Not Found
+            AlbumRepository->>AlbumRepository: Throw ResourceNotFoundException
+        else Found
+            AlbumRepository-->>-AlbumService: AlbumEntity
+        end
+        AlbumService-->>-StockService: AlbumEntity
+
+        StockService->>StockService: Set AlbumEntity on StockEntity
+        StockService->>+StockRepository: save(stockEntity)
+        StockRepository-->>-StockService: StockEntity
+        StockService->>StockService: Map StockEntity to StockResponseDto
+        StockService-->>-StockController: StockResponseDto
+
+        StockController-->>-User: ResponseEntity<StockResponseDto>(HttpStatus.CREATED)
+    end

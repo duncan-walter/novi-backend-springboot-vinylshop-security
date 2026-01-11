@@ -1,0 +1,27 @@
+sequenceDiagram
+    box Get all artists by album
+        actor User
+        participant AlbumController
+        participant AlbumService
+        participant AlbumRepository
+    end
+
+    User->>+AlbumController: /api/albums/{id}
+    AlbumController->>AlbumController: Authentication check
+    alt Unauthorized
+        AlbumController-->>User: ResponseEntity(HttpStatus.UNAUTHORIZED)
+    else Authorized
+        AlbumController->>+AlbumService: findAlbumById(id)
+
+        AlbumService->>+AlbumRepository: findById(id)
+        alt Not Found
+            AlbumRepository->>AlbumRepository: Throw ResourceNotFoundException
+        else Found
+            AlbumRepository-->>-AlbumService: AlbumEntity
+        end
+
+        AlbumService->>AlbumService: Map AlbumEntity to AlbumExtendedResponseDto
+        Note right of AlbumService: ⚠️ AlbumExtendedResponseDto includes artists
+        AlbumService-->>-AlbumController: AlbumExtendedResponseDto
+        AlbumController-->>-User: ResponseEntity<AlbumExtendedResponseDto>
+    end
