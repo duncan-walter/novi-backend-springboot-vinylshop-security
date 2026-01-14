@@ -1,6 +1,5 @@
 package walter.duncan.vinylwebshop.services;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -89,10 +88,10 @@ class AlbumServiceTest {
                 "The Nightmare Before Christmas 2",
                 1993
         );
-        albumEntity1.setGenre(genreEntity);
-        albumEntity1.setPublisher(publisherEntity);
-        albumEntity1.setStockItems(new HashSet<>(List.of()));
-        albumEntity1.setArtists(new HashSet<>(List.of(artistEntity)));
+        albumEntity2.setGenre(genreEntity);
+        albumEntity2.setPublisher(publisherEntity);
+        albumEntity2.setStockItems(new HashSet<>(List.of()));
+        albumEntity2.setArtists(new HashSet<>(List.of(artistEntity)));
 
         var albumEntities = List.of(
                 albumEntity1,
