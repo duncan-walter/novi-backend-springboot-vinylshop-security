@@ -7,6 +7,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.validator.constraints.Length;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -27,7 +28,7 @@ public class AlbumEntity extends BaseEntity {
     private PublisherEntity publisher;
 
     @OneToMany(mappedBy = "album")
-    private Set<StockEntity> stockItems;
+    private Set<StockEntity> stockItems = new HashSet<>();
 
     @ManyToMany
     @JoinTable(
@@ -35,7 +36,7 @@ public class AlbumEntity extends BaseEntity {
             joinColumns = @JoinColumn(name = "album_id"),
             inverseJoinColumns = @JoinColumn(name = "artist_id")
     )
-    private Set<ArtistEntity> artists;
+    private Set<ArtistEntity> artists = new HashSet<>();;
 
     // It was tempting to choose @OneToOne here, but then a genre can only be referenced by one album.
     // In reality albums can share the same genre of course, hence why I picked @ManyToOne.

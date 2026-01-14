@@ -3,6 +3,7 @@ package walter.duncan.vinylwebshop.entities;
 import jakarta.persistence.*;
 import org.hibernate.validator.constraints.Length;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -17,7 +18,7 @@ public class ArtistEntity extends BaseEntity {
     private String biography;
 
     @ManyToMany(mappedBy = "artists")
-    private Set<AlbumEntity> albums;
+    private Set<AlbumEntity> albums = new HashSet<>();;
 
     public String getName() {
         return this.name;

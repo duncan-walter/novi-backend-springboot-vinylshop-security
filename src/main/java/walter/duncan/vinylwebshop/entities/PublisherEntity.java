@@ -2,6 +2,7 @@ package walter.duncan.vinylwebshop.entities;
 
 import jakarta.persistence.*;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -17,7 +18,7 @@ public class PublisherEntity extends BaseEntity {
     private String contactDetails;
 
     @OneToMany(mappedBy = "publisher")
-    private Set<AlbumEntity> albums;
+    private Set<AlbumEntity> albums = new HashSet<>();
 
     public String getName() {
         return this.name;
