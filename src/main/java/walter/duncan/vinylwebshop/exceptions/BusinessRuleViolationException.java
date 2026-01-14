@@ -1,14 +1,14 @@
 package walter.duncan.vinylwebshop.exceptions;
 
 public class BusinessRuleViolationException extends RuntimeException {
-    private final BusinessRuleViolation code;
+    private final BusinessRuleViolation violation;
 
     public BusinessRuleViolationException(BusinessRuleViolation violation, String message) {
         super(message);
-        this.code = violation;
+        this.violation = violation;
     }
 
-    public BusinessRuleViolation getCode() {
-        return this.code;
+    public BusinessRuleViolation getViolation() {
+        return this.violation;
     }
 }

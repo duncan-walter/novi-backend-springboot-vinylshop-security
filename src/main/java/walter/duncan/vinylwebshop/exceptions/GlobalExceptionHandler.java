@@ -72,7 +72,7 @@ public class GlobalExceptionHandler {
         problemDetail.setDetail("A business rule was violated.");
 
         Map<String, String> businessRuleErrors = new HashMap<>();
-        businessRuleErrors.put(exception.getCode().toString(), exception.getMessage());
+        businessRuleErrors.put(exception.getViolation().toString(), exception.getMessage());
 
         /* TODO: Look into collecting multiple business rule violations during one response.
             At the moment this can't be achieved yet since a BusinessRuleViolationException is thrown when it is found.
