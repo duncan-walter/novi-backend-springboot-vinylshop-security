@@ -210,11 +210,43 @@ class AlbumServiceTest {
     }
 
     @Test
-    void linkArtist() {
+    void linkArtist_withExistingArtist_shouldAddArtistToAlbum() {
+        // Arrange
+        var albumId = 1L;
+        var artistId = 1L;
+        var persistedAlbumEntity = AlbumTestData.albumEntity(albumId, "Henk and the Hillbillies", 2026);
+        var persistedArtistEntity = ArtistTestData.artistEntity(artistId, "Henk", "The legendary");
+
+        when(albumRepository.findById(albumId)).thenReturn(Optional.of(persistedAlbumEntity));
+        when(artistService.getExistingById(artistId)).thenReturn(persistedArtistEntity);
+
+        // Act
+        albumService.linkArtist(albumId, artistId);
+
+        // Assert
+        assertTrue(persistedAlbumEntity.getArtists().contains(persistedArtistEntity));
+        verify(albumRepository, times(1)).save(persistedAlbumEntity);
     }
 
     @Test
-    void unlinkArtist() {
+    void unlinkArtist_withExistingArtist_shouldUnlinkArtistFromAlbum() {
+        // Arrange
+        var albumId = 1L;
+        var artistId = 1L;
+        var persistedAlbumEntity = AlbumTestData.albumEntity(albumId, "Henk and the Hillbillies", 2026);
+        var persistedArtistEntity = ArtistTestData.artistEntity(artistId, "Henk", "The legendary");
+        persistedAlbumEntity.setArtists(new HashSet<>(List.of(persistedArtistEntity)));
+
+        when(albumRepository.findById(albumId)).thenReturn(Optional.of(persistedAlbumEntity));
+        when(artistService.getExistingById(artistId)).thenReturn(persistedArtistEntity);
+
+        // Act
+        albumService.unlinkArtist(albumId, artistId);
+
+        // Assert
+        assertFalse(persistedAlbumEntity.getArtists().contains(persistedArtistEntity));
+        assertTrue(persistedAlbumEntity.getArtists().isEmpty());
+        verify(albumRepository, times(1)).save(persistedAlbumEntity);
     }
 }
 
@@ -308,5 +340,22 @@ class PublisherTestData {
         publisherEntity.setContactDetails("+1 217-703-2085");
 
         return publisherEntity;
+    }
+}
+
+class ArtistTestData {
+    private ArtistTestData() { }
+
+    public static ArtistEntity artistEntity(Long id, String name, String biography) {
+        var artistEntity = new ArtistEntity();
+
+        if (id != null) {
+            ReflectionTestUtils.setField(artistEntity, "id", id);
+        }
+
+        artistEntity.setName(name);
+        artistEntity.setBiography(biography);
+
+        return artistEntity;
     }
 }
