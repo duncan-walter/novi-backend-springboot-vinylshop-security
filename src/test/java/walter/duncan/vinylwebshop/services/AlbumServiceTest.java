@@ -75,13 +75,21 @@ class AlbumServiceTest {
         artistEntity.setName("Mr. Skeleton");
         artistEntity.setBiography("He has lived his year spooking many people with his music, now he's dead. Serves him right.");
 
-        var albumEntity1 = AlbumTestData.albumEntity(1L);
+        var albumEntity1 = AlbumTestData.albumEntity(
+                1L,
+                "The Nightmare Before Christmas",
+                1993
+        );
         albumEntity1.setGenre(genreEntity);
         albumEntity1.setPublisher(publisherEntity);
         albumEntity1.setStockItems(new HashSet<>(List.of(stockEntity)));
         albumEntity1.setArtists(new HashSet<>(List.of(artistEntity)));
 
-        var albumEntity2 = AlbumTestData.albumEntity(2L);
+        var albumEntity2 = AlbumTestData.albumEntity(
+                2L,
+                "The Nightmare Before Christmas 2",
+                1993
+        );
         albumEntity1.setGenre(genreEntity);
         albumEntity1.setPublisher(publisherEntity);
         albumEntity1.setStockItems(new HashSet<>(List.of()));
@@ -111,7 +119,11 @@ class AlbumServiceTest {
         // Arrange
         var albumId = 2L;
         var albumExtendedResponseDto = AlbumTestData.albumExtendedResponseDto(albumId, 2L);
-        var albumEntity = AlbumTestData.albumEntity(albumId);
+        var albumEntity = AlbumTestData.albumEntity(
+                albumId,
+                "The Nightmare Before Christmas",
+                1993
+        );
 
         when(albumRepository.findById(albumId)).thenReturn(Optional.of(albumEntity));
         when(albumExtendedDtoMapper.toDto(albumEntity)).thenReturn(albumExtendedResponseDto);
@@ -129,12 +141,15 @@ class AlbumServiceTest {
     void createAlbum_withExistingGenreAndPublisher_shouldReturnCreatedAlbumResponseDto() {
         // Arrange
         var albumId = 1L;
+        var albumTitle = "The Nightmare Before Christmas";
+        var albumReleaseYear = 1993;
         var genreId = 1L;
         var publisherId = 1L;
-        var albumRequestDto = AlbumTestData.albumRequestDto();
-        var albumResponseDto = AlbumTestData.albumResponseDto(albumId);
-        var mappedAlbumEntity = AlbumTestData.albumEntity();
-        var createdAlbumEntity = AlbumTestData.albumEntity(albumId);
+
+        var albumRequestDto = AlbumTestData.albumRequestDto(albumTitle, albumReleaseYear);
+        var albumResponseDto = AlbumTestData.albumResponseDto(albumId, albumTitle, albumReleaseYear);
+        var mappedAlbumEntity = AlbumTestData.albumEntity(albumTitle, albumReleaseYear);
+        var createdAlbumEntity = AlbumTestData.albumEntity(albumId, albumTitle, albumReleaseYear);
         var genreEntity = GenreTestData.genreEntity(genreId);
         var publisherEntity = PublisherTestData.publisherEntity(publisherId);
 
@@ -155,7 +170,27 @@ class AlbumServiceTest {
     }
 
     @Test
-    void updateAlbum() {
+    void updateAlbum_withNewTitleAndReleaseYear_shouldReturnUpdatedAlbumResponseDto() {
+        // Arrange
+        var albumId = 1L;
+        var newAlbumTitle = "Updated title";
+        var newAlbumReleaseYear = 2000;
+
+        var albumRequestDto = AlbumTestData.albumRequestDto(newAlbumTitle, newAlbumReleaseYear);
+        var albumEntity = AlbumTestData.albumEntity(albumId, "The Nightmare Before Christmas", 1993);
+        var albumResponseDto = AlbumTestData.albumResponseDto(albumId, newAlbumTitle, newAlbumReleaseYear);
+
+        when(albumRepository.findById(albumId)).thenReturn(Optional.of(albumEntity));
+        when(albumRepository.save(any(AlbumEntity.class))).thenReturn(albumEntity);
+        when(albumDtoMapper.toDto(albumEntity)).thenReturn(albumResponseDto);
+
+        // Act
+        var result = albumService.updateAlbum(albumId, albumRequestDto);
+
+        // Assert
+        assertEquals(albumResponseDto, result);
+        assertEquals(newAlbumTitle, albumEntity.getTitle());
+        assertEquals(newAlbumReleaseYear, albumEntity.getReleaseYear());
     }
 
     @Test
@@ -176,11 +211,11 @@ class AlbumServiceTest {
 class AlbumTestData {
     private AlbumTestData() { }
 
-    public static AlbumEntity albumEntity() {
-        return albumEntity(null);
+    public static AlbumEntity albumEntity(String title, int releaseYear) {
+        return albumEntity(null, title, releaseYear);
     }
 
-    public static AlbumEntity albumEntity(Long id) {
+    public static AlbumEntity albumEntity(Long id, String title, int releaseYear) {
         var albumEntity = new AlbumEntity();
 
         if (id != null) {
@@ -188,29 +223,29 @@ class AlbumTestData {
             ReflectionTestUtils.setField(albumEntity, "id", id);
         }
 
-        albumEntity.setTitle("The Nightmare Before Christmas");
-        albumEntity.setReleaseYear(1993);
+        albumEntity.setTitle(title);
+        albumEntity.setReleaseYear(releaseYear);
         albumEntity.setGenre(GenreTestData.genreEntity(1L));
         albumEntity.setPublisher(PublisherTestData.publisherEntity(1L));
 
         return albumEntity;
     }
 
-    public static AlbumRequestDto albumRequestDto() {
+    public static AlbumRequestDto albumRequestDto(String title, int releaseYear) {
         var albumRequestDto = new AlbumRequestDto();
-        ReflectionTestUtils.setField(albumRequestDto, "title", "The Nightmare Before Christmas");
-        ReflectionTestUtils.setField(albumRequestDto, "releaseYear", 1993);
+        ReflectionTestUtils.setField(albumRequestDto, "title", title);
+        ReflectionTestUtils.setField(albumRequestDto, "releaseYear", releaseYear);
         ReflectionTestUtils.setField(albumRequestDto, "genreId", 1L);
         ReflectionTestUtils.setField(albumRequestDto, "publisherId", 1L);
 
         return albumRequestDto;
     }
 
-    public static AlbumResponseDto albumResponseDto(Long id) {
+    public static AlbumResponseDto albumResponseDto(Long id, String title, int releaseYear) {
         return new AlbumResponseDto(
                 id,
-                "The Nightmare Before Christmas",
-                1993,
+                title,
+                releaseYear,
                 new GenreResponseDto(1L, "Halloween", "Very spooky"),
                 new PublisherResponseDto(1L, "Spooky records", "1 Spooky avenue", "+1 217-703-2085")
         );
