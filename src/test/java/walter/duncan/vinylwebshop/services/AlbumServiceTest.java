@@ -16,6 +16,8 @@ import walter.duncan.vinylwebshop.dtos.genre.GenreResponseDto;
 import walter.duncan.vinylwebshop.dtos.publisher.PublisherResponseDto;
 import walter.duncan.vinylwebshop.dtos.stock.StockResponseDto;
 import walter.duncan.vinylwebshop.entities.*;
+import walter.duncan.vinylwebshop.exceptions.BusinessRuleViolation;
+import walter.duncan.vinylwebshop.exceptions.BusinessRuleViolationException;
 import walter.duncan.vinylwebshop.mappers.AlbumDtoMapper;
 import walter.duncan.vinylwebshop.mappers.AlbumExtendedDtoMapper;
 import walter.duncan.vinylwebshop.repositories.AlbumRepository;
@@ -194,6 +196,29 @@ class AlbumServiceTest {
     }
 
     @Test
+    void updateAlbum_withSameGenreAndPublisher_shouldNotCallGetExistingById() {
+        // Arrange
+        var albumId = 1L;
+        var newAlbumTitle = "Updated title";
+
+        var albumEntity = AlbumTestData.albumEntity(albumId, "The Nightmare Before Christmas", 1993);
+        var albumRequestDto = AlbumTestData.albumRequestDto(newAlbumTitle, albumEntity.getReleaseYear());
+        var genreEntity = albumEntity.getGenre();
+        var publisherEntity = albumEntity.getPublisher();
+
+        when(albumRepository.findById(albumId)).thenReturn(Optional.of(albumEntity));
+        when(genreService.isSameById(genreEntity, genreEntity.getId())).thenReturn(true);
+        when(publisherService.isSameById(publisherEntity, publisherEntity.getId())).thenReturn(true);
+
+        // Act
+        albumService.updateAlbum(albumId, albumRequestDto);
+
+        // Assert
+        verify(genreService, never()).getExistingById(anyLong());
+        verify(publisherService, never()).getExistingById(anyLong());
+    }
+
+    @Test
     void deleteAlbum_withExistingAlbum_shouldDeleteAlbum() {
         // Arrange
         var albumId = 1L;
@@ -207,6 +232,30 @@ class AlbumServiceTest {
         // Assert
         verify(albumRepository, times(1)).findById(albumId);
         verify(albumRepository, times(1)).deleteById(albumId);
+    }
+
+    @Test
+    void deleteAlbum_withExistingStockOnAlbum_shouldThrowBusinessRuleViolationException() {
+        // Arrange
+        var albumId = 1L;
+        var albumEntity = AlbumTestData.albumEntity(albumId, "The Nightmare Before Christmas", 1993);
+        var stockEntity = new StockEntity();
+
+        stockEntity.setAlbum(albumEntity);
+        stockEntity.setCondition("Brand spanking new");
+        stockEntity.setPrice(100.0);
+        albumEntity.setStockItems(new HashSet<>(List.of(stockEntity)));
+
+        when(albumRepository.findById(albumId)).thenReturn(Optional.of(albumEntity));
+
+        // Act
+        var exception = assertThrows(
+                BusinessRuleViolationException.class,
+                () -> albumService.deleteAlbum(albumId)
+        );
+
+        // Assert
+        assertEquals(BusinessRuleViolation.CANNOT_DELETE_ALBUM_WHEN_IT_HAS_STOCK, exception.getViolation());
     }
 
     @Test
