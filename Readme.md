@@ -19,6 +19,15 @@ Vervolgens voeg je de security toe aan je code en ga je zorgen dat gebruikers ee
 # Randvoorwaarden
 
 - Je voldoet aan de randvoorwaarden van de vorige opdracht.
+- Je hebt 1 Realm
+- Je hebt 1 Client
+- Je hebt 2 Users met login credentials (password)
+- Je levert een export in van je KeyCloak Realm, incl. users
+- Je security heeft de volgende toegangsrechten:
+        - Stock mag alleen door ADMIN worden opgehaald, aangepast, verwijderd of creëren.
+        - Albums mogen door iedereen worden opgehaald (publiek)
+        - Voor alle entiteiten mag alleen de ADMIN creëren, verwijderen of aanpassen.
+        - Alle entiteiten (behalve stock) mogen door alle ingelogde gebruikers opgehaald worden.
 
 [//]: # (TODO)
 
@@ -54,11 +63,11 @@ Test of het werk door in te loggen als deze test-gebruikers op `localhost:9090/r
 Maak in het Realm een Client aan voor de VinylShop backend applicatie. 
 
 #### General settings
-Als client-name mag je `VinylShopBackend` gebruiken.
+Als client-id mag je `VinylShopBackend` gebruiken.
 
 #### Capability config
 Zorg dat de `Client authentication ` aan staat. 
-Zorg ook dat je de `Standaard Flow` en `Service Account Role` geselecteerd hebt. 
+Zorg ook dat je de `Standard Flow` en `Service Account Role` geselecteerd hebt. 
 
 #### Login settings
 Vul hier tenminste de `valid redirects` in met:
@@ -154,7 +163,7 @@ Je kunt nu opnieuw een token aanvragen in Postman (je hoeft niet alles opnieuw i
 ## Stap 7 (RequestMatchers)
 
 Nu is het tijd om specifieker te zijn in de toegangsrechten die we willen verlenen. Pas de volgende regels toe: 
-- Stock mag allen door ADMIN worden opgehaald, aangepast, verwijderd of creëren.
+- Stock mag alleen door ADMIN worden opgehaald, aangepast, verwijderd of creëren.
 - Albums mogen door iedereen worden opgehaald (publiek)
 - Voor alle entiteiten mag alleen de ADMIN creëren, verwijderen of aanpassen.
 - Alle entiteiten (behalve stock) mogen door alle ingelogde gebruikers opgehaald worden.
