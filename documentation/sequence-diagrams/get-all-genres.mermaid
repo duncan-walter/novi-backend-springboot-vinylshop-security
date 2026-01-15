@@ -1,0 +1,24 @@
+sequenceDiagram
+    box Get all genres
+        actor User
+        participant GenreController
+        participant GenreService
+        participant GenreRepository
+    end
+
+    User->>+GenreController: GET /api/genres
+    GenreController->>GenreController: Authentication check
+    alt Unauthorized
+        GenreController-->>User: ResponseEntity(HttpStatus.UNAUTHORIZED)
+    else Authorized
+        GenreController->>+GenreService: findAllGenres()
+        GenreService->>+GenreRepository: findAll()
+        GenreRepository-->>-GenreService: List<GenreEntity>
+
+        loop For each GenreEntity
+            GenreService->>GenreService: Map GenreEntity to GenreResponseDto
+        end
+
+        GenreService-->>-GenreController: List<GenreResponseDto>
+        GenreController-->>-User: ResponseEntity<List<GenreResponseDto>>
+    end
