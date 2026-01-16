@@ -4,7 +4,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -28,14 +30,14 @@ public class SecurityConfig {
     @Value("${spring.security.oauth2.resourceserver.jwt.audiences}")
     private String audience;
 
-    @Value("${realm-name}")
-    private String realmName;
+    @Value("${client-id}")
+    private String clientId;
 
     @Bean
     public SecurityFilterChain configure(HttpSecurity http) throws Exception {
         return http
-                .httpBasic(hp -> hp.disable())
-                .csrf(csrf -> csrf.disable())
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> { })
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt
@@ -43,12 +45,44 @@ public class SecurityConfig {
                                 .decoder(jwtDecoder())
                         ))
                 .authorizeHttpRequests(authorize -> authorize
-                        .anyRequest().authenticated()
+                        // ADMIN routes
+                        .requestMatchers("/albums/{id}/stocks/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST,
+                                "/albums", "albums/{id}/**",
+                                "/artists",
+                                "/genres",
+                                "/publishers"
+                        ).hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT,
+                                "/albums/{id}",
+                                "/artists/{id}",
+                                "/genres/{id}",
+                                "/publishers/{id}"
+                        ).hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE,
+                                "/albums/{id}/**",
+                                "/artists/{id}",
+                                "/genres/{id}",
+                                "/publishers/{id}"
+                        ).hasRole("ADMIN")
+
+                        // Authenticated routes
+                        .requestMatchers(
+                                "/artists/**",
+                                "/genres/**",
+                                "/publishers/**"
+                        ).authenticated()
+
+                        // Public routes
+                        .requestMatchers("/login").permitAll()
+                        .requestMatchers("/albums/**").permitAll()
+
+                        // Default
+                        .anyRequest().denyAll()
                 )
                 .sessionManagement(session-> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
     }
-
 
     public JwtDecoder jwtDecoder(){
         NimbusJwtDecoder jwtDecoder = JwtDecoders.fromOidcIssuerLocation(issuer);
@@ -60,7 +94,6 @@ public class SecurityConfig {
         return jwtDecoder;
     }
 
-
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(new Converter<>() {
@@ -69,18 +102,18 @@ public class SecurityConfig {
                 Collection<GrantedAuthority> grantedAuthorities = new ArrayList<>();
 
                 for (String authority : getAuthorities(source)) {
-                    grantedAuthorities.add(new SimpleGrantedAuthority( authority));
+                    grantedAuthorities.add(new SimpleGrantedAuthority(authority));
                 }
 
                 return grantedAuthorities;
             }
 
             private List<String> getAuthorities(Jwt jwt){
-                Map<String, Object> resourceAcces = jwt.getClaim("resource_access");
+                Map<String, Object> resourceAccess = jwt.getClaim("resource_access");
 
-                if (resourceAcces != null) {
-                    if (resourceAcces.get(realmName) instanceof Map) {
-                        Map<String, Object> client = (Map<String, Object>) resourceAcces.get(realmName);
+                if (resourceAccess != null) {
+                    if (resourceAccess.get(clientId) instanceof Map) {
+                        Map<String, Object> client = (Map<String, Object>) resourceAccess.get(clientId);
 
                         if (client != null && client.containsKey("roles")) {
                             return (List<String>) client.get("roles");
