@@ -1,4 +1,4 @@
-package nl.novi.vinylshop.config;
+package walter.duncan.vinylwebshop.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -22,27 +22,28 @@ import java.util.Map;
 
 @Configuration
 public class SecurityConfig {
-
     @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
     private String issuer;
+
     @Value("${spring.security.oauth2.resourceserver.jwt.audiences}")
     private String audience;
-    @Value("${client-id}")
-    private String clientId;
+
+    @Value("${realm-name}")
+    private String realmName;
 
     @Bean
     public SecurityFilterChain configure(HttpSecurity http) throws Exception {
         return http
                 .httpBasic(hp -> hp.disable())
-                .csrf(csrf->csrf.disable())
-                .cors(cors->{})
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> { })
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt
                                 .jwtAuthenticationConverter(jwtAuthenticationConverter())
                                 .decoder(jwtDecoder())
                         ))
                 .authorizeHttpRequests(authorize -> authorize
-                        .anyRequest().permitAll()
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(session-> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
@@ -51,49 +52,54 @@ public class SecurityConfig {
 
     public JwtDecoder jwtDecoder(){
         NimbusJwtDecoder jwtDecoder = JwtDecoders.fromOidcIssuerLocation(issuer);
-
         OAuth2TokenValidator<Jwt> audienceValidator = new JwtAudienceValidator(audience);
         OAuth2TokenValidator<Jwt> withIssuer = JwtValidators.createDefaultWithIssuer(issuer);
         OAuth2TokenValidator<Jwt> withAudience = new DelegatingOAuth2TokenValidator<>(withIssuer, audienceValidator);
         jwtDecoder.setJwtValidator(withAudience);
+
         return jwtDecoder;
     }
 
 
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
-
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(new Converter<>() {
             @Override
             public Collection<GrantedAuthority> convert(Jwt source) {
                 Collection<GrantedAuthority> grantedAuthorities = new ArrayList<>();
+
                 for (String authority : getAuthorities(source)) {
                     grantedAuthorities.add(new SimpleGrantedAuthority( authority));
                 }
+
                 return grantedAuthorities;
             }
+
             private List<String> getAuthorities(Jwt jwt){
                 Map<String, Object> resourceAcces = jwt.getClaim("resource_access");
+
                 if (resourceAcces != null) {
-                    if (resourceAcces.get(clientId) instanceof Map) {
-                        Map<String, Object> client = (Map<String, Object>) resourceAcces.get(clientId);
+                    if (resourceAcces.get(realmName) instanceof Map) {
+                        Map<String, Object> client = (Map<String, Object>) resourceAcces.get(realmName);
+
                         if (client != null && client.containsKey("roles")) {
                             return (List<String>) client.get("roles");
                         }
                     } else {
                         Map<String, Object> realmAcces = jwt.getClaim("realm_access");
+
                         if (realmAcces != null && realmAcces.containsKey("roles")) {
                             return (List<String>) realmAcces.get("roles");
                         }
+
                         return new ArrayList<>();
                     }
                 }
+
                 return new ArrayList<>();
             }
         });
+
         return jwtAuthenticationConverter;
     }
-
-
-
 }
