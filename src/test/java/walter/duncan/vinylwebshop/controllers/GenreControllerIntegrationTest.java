@@ -21,7 +21,7 @@ import walter.duncan.vinylwebshop.dtos.genre.GenreRequestDto;
 import walter.duncan.vinylwebshop.dtos.genre.GenreResponseDto;
 
 @ActiveProfiles("test")
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 @SpringBootTest
 public class GenreControllerIntegrationTest {
     @Autowired
