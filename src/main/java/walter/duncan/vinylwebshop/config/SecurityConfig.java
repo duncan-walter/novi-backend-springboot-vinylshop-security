@@ -76,7 +76,8 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/artists/**",
                                 "/genres/**",
-                                "/publishers/**"
+                                "/publishers/**",
+                                "/profiles/**"
                         ).authenticated()
 
                         // Public routes

@@ -1,10 +1,10 @@
 {
   "info": {
-    "_postman_id": "c92d62ff-ec71-49a8-9733-bd63dfd1e8f4",
+    "_postman_id": "17e2d895-c752-432e-87c4-57923b09a944",
     "name": "Vinyl Webshop",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "50199064",
-    "_collection_link": "https://go.postman.co/collection/50199064-c92d62ff-ec71-49a8-9733-bd63dfd1e8f4?source=collection_link"
+    "_collection_link": "https://go.postman.co/collection/50199064-17e2d895-c752-432e-87c4-57923b09a944?source=collection_link"
   },
   "item": [
     {
@@ -739,6 +739,73 @@
                   "key": "id",
                   "value": "1"
                 }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Profiles",
+      "item": [
+        {
+          "name": "Get profile(s)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/profiles",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "profiles"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get albums",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/profiles/albums",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "profiles",
+                "albums"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Link album",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"albumId\": 1\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profiles/albums",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "profiles",
+                "albums"
               ]
             }
           },
