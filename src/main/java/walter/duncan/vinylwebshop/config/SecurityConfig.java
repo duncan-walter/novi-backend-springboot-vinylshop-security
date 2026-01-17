@@ -3,6 +3,7 @@ package walter.duncan.vinylwebshop.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -23,6 +24,11 @@ import java.util.List;
 import java.util.Map;
 
 @Configuration
+/* TODO: Find a way to make integration tests work with security without editing main production code
+    Adding addFilters = false to the test class was not enough. This configuration class was still being executed
+    resulting in failing tests since the configure(HttpSecurity http) method is trying to contact the (not running) keycloak server.
+ */
+@Profile("!test")
 public class SecurityConfig {
     @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
     private String issuer;
